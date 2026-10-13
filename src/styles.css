@@ -23,6 +23,26 @@ textarea {
   outline-offset: 2px;
 }
 
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.field input,
+.field textarea,
+.field select {
+  padding: 0.5rem;
+  border: 1px solid #767676;
+  border-radius: 4px;
+}
+
+.field-error {
+  color: #a51d2d;
+  margin: 0;
+}
+
 .article-list {
   list-style: none;
   padding: 0;

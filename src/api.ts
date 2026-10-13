@@ -1,5 +1,5 @@
 import { config } from './config';
-import { Article } from './types';
+import { Article, ArticleInput } from './types';
 
 export class ApiError extends Error {
   readonly status: number;
@@ -27,4 +27,19 @@ export async function parseResponse<T>(response: Response): Promise<T> {
 export async function fetchPublishedArticles(): Promise<Article[]> {
   const response = await fetch(`${config.apiUrl}/articles?status=published`);
   return parseResponse<Article[]>(response);
+}
+
+export async function createArticle(
+  token: string,
+  input: ArticleInput,
+): Promise<Article> {
+  const response = await fetch(`${config.apiUrl}/articles`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(input),
+  });
+  return parseResponse<Article>(response);
 }
