@@ -22,3 +22,16 @@ textarea {
   outline: 3px solid #1a5fb4;
   outline-offset: 2px;
 }
+
+.article-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.article-list li {
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+  padding: 1rem;
+}
