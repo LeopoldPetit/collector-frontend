@@ -1,12 +1,14 @@
 import { ChangeEvent, FormEvent, ReactNode, useState } from 'react';
-import { createArticle } from '../api';
+import { createArticle, fetchArticle } from '../api';
 import { CATEGORIES } from '../categories';
-import { ArticleInput } from '../types';
+import { Article, ArticleInput } from '../types';
 import { FieldErrors, validateArticle } from '../validation';
+import { ArticleStatus } from './ArticleStatus';
 
 interface SellPageProps {
   getToken: () => Promise<string | undefined>;
-  publish?: (token: string, input: ArticleInput) => Promise<unknown>;
+  publish?: (token: string, input: ArticleInput) => Promise<Article>;
+  loadArticle?: (id: string) => Promise<Article>;
 }
 
 interface FormState {
@@ -67,11 +69,16 @@ function Field({
   );
 }
 
-export function SellPage({ getToken, publish = publishArticle }: SellPageProps) {
+export function SellPage({
+  getToken,
+  publish = publishArticle,
+  loadArticle = fetchArticle,
+}: SellPageProps) {
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [sending, setSending] = useState(false);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const [submittedId, setSubmittedId] = useState<string | null>(null);
 
   function update(field: keyof FormState) {
     return (
@@ -85,6 +92,7 @@ export function SellPage({ getToken, publish = publishArticle }: SellPageProps) 
     const fieldErrors = validateArticle(input);
     setErrors(fieldErrors);
     setFeedback(null);
+    setSubmittedId(null);
     if (Object.keys(fieldErrors).length > 0) {
       return;
     }
@@ -99,7 +107,8 @@ export function SellPage({ getToken, publish = publishArticle }: SellPageProps) 
         });
         return;
       }
-      await publish(token, input);
+      const article = await publish(token, input);
+      setSubmittedId(article.id);
       setForm(EMPTY_FORM);
       setFeedback({
         kind: 'success',
@@ -193,6 +202,13 @@ export function SellPage({ getToken, publish = publishArticle }: SellPageProps) 
         <p role={feedback.kind === 'error' ? 'alert' : 'status'}>
           {feedback.message}
         </p>
+      )}
+      {submittedId && (
+        <ArticleStatus
+          key={submittedId}
+          articleId={submittedId}
+          loadArticle={loadArticle}
+        />
       )}
     </section>
   );

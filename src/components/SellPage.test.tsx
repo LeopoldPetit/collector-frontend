@@ -1,9 +1,22 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { Article } from '../types';
 import { SellPage } from './SellPage';
 
 const VALID_DESCRIPTION =
   'Un timbre en excellent état, provenance certifiée, description suffisamment longue.';
+
+const SUBMITTED_ARTICLE: Article = {
+  id: 'a1',
+  title: 'Timbre rare 1920',
+  description: VALID_DESCRIPTION,
+  price: '42.00',
+  shippingCost: '5.00',
+  category: 'timbres',
+  status: 'DRAFT',
+  rejectionReason: null,
+  createdAt: '2026-10-15T10:00:00.000Z',
+};
 
 function fillValidForm() {
   fireEvent.change(screen.getByLabelText('Titre'), {
@@ -80,5 +93,25 @@ describe('SellPage', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Rôle insuffisant pour cette action',
     );
+  });
+
+  it('suit le statut de l\'article soumis', async () => {
+    const publish = vi.fn().mockResolvedValue(SUBMITTED_ARTICLE);
+    const loadArticle = vi
+      .fn()
+      .mockResolvedValue({ ...SUBMITTED_ARTICLE, status: 'PUBLISHED' });
+    render(
+      <SellPage
+        getToken={async () => 'token'}
+        publish={publish}
+        loadArticle={loadArticle}
+      />,
+    );
+    fillValidForm();
+
+    fireEvent.click(screen.getByRole('button', { name: "Publier l'article" }));
+
+    expect(await screen.findByText('Statut : Publié')).toBeInTheDocument();
+    expect(loadArticle).toHaveBeenCalledWith('a1');
   });
 });

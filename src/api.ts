@@ -29,6 +29,13 @@ export async function fetchPublishedArticles(): Promise<Article[]> {
   return parseResponse<Article[]>(response);
 }
 
+export async function fetchArticle(id: string): Promise<Article> {
+  const response = await fetch(
+    `${config.apiUrl}/articles/${encodeURIComponent(id)}`,
+  );
+  return parseResponse<Article>(response);
+}
+
 export async function createArticle(
   token: string,
   input: ArticleInput,

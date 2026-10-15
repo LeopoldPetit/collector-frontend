@@ -6,6 +6,7 @@ export interface Article {
   shippingCost: string;
   category: string;
   status: string;
+  rejectionReason?: string | null;
   createdAt: string;
 }
 
