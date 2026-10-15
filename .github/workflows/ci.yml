@@ -15,3 +15,6 @@ jobs:
       image-name: ghcr.io/leopoldpetit/collector-frontend
       node-version: "22"
       push-image: ${{ github.event_name == 'push' }}
+      build-args: |
+        VITE_API_URL=https://api.localhost:8443
+        VITE_KEYCLOAK_URL=https://keycloak.localhost:8443
